@@ -24,6 +24,31 @@
   <h1 class="text-3xl font-bold mb-2" x-text="artist.name"></h1>
   <p class="text-gray-300 mb-6" x-text="artist.bio"></p>
 
+  <!-- Upload Form -->
+  <div class="mb-8 border border-gray-700 rounded p-4">
+    <h2 class="text-xl font-semibold mb-2">Upload New Track</h2>
+    <form @submit.prevent="uploadTrack" class="space-y-4">
+      <div>
+        <label class="block text-sm mb-1">Title</label>
+        <input x-model="newTrack.title" type="text" class="w-full p-2 rounded bg-gray-800 border border-gray-600" required>
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Audio File</label>
+        <input @change="e => newTrack.file = e.target.files[0]" type="file" accept="audio/*" class="w-full text-sm" required>
+      </div>
+      <div>
+        <label class="inline-flex items-center space-x-2">
+          <input type="checkbox" x-model="newTrack.allowDownload" class="form-checkbox">
+          <span>Allow Download</span>
+        </label>
+      </div>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-semibold">
+        Upload
+      </button>
+    </form>
+  </div>
+
+  <!-- Track List -->
   <template x-if="tracks.length > 0">
     <div>
       <h2 class="text-xl font-semibold mb-2">Tracks</h2>
@@ -49,13 +74,16 @@
     Alpine.data('artistPage', () => ({
       artist: {},
       tracks: [],
+      newTrack: {
+        title: '',
+        file: null,
+        allowDownload: false
+      },
       async init() {
         const params = new URLSearchParams(window.location.search);
         const artistId = params.get('id');
 
-        const artistRecord = await pb.collection('artists').getOne(artistId, {
-          expand: 'label'
-        });
+        const artistRecord = await pb.collection('artists').getOne(artistId);
         this.artist = artistRecord;
 
         const trackList = await pb.collection('tracks').getFullList({
@@ -66,6 +94,22 @@
       },
       getTrackUrl(track) {
         return pb.files.getUrl(track, track.file);
+      },
+      async uploadTrack() {
+        const form = new FormData();
+        form.append('title', this.newTrack.title);
+        form.append('file', this.newTrack.file);
+        form.append('allowDownload', this.newTrack.allowDownload);
+        form.append('artist', this.artist.id);
+
+        const record = await pb.collection('tracks').create(form);
+        this.tracks.unshift(record);
+
+        this.newTrack = {
+          title: '',
+          file: null,
+          allowDownload: false
+        };
       }
     }));
   });
