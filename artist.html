@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-900 text-white font-sans">
+<head>
+  <meta charset="UTF-8">
+  <title>Artist Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+</head>
+<body class="p-8" x-data="artistPage" x-init="init()">
+  <a href="index.html" class="text-sm text-gray-400 underline mb-4 block">&larr; Back to all artists</a>
+  <h1 class="text-3xl font-bold mb-2" x-text="artist.name"></h1>
+  <p class="text-gray-300 mb-6" x-text="artist.bio"></p>
+
+  <template x-if="tracks.length > 0">
+    <div>
+      <h2 class="text-xl font-semibold mb-2">Tracks</h2>
+      <ul class="space-y-2">
+        <template x-for="track in tracks" :key="track.id">
+          <li class="bg-gray-800 p-4 rounded">
+            <div class="font-medium" x-text="track.title"></div>
+            <audio class="mt-2 w-full" controls :src="getTrackUrl(track)"></audio>
+            <template x-if="track.allowDownload">
+              <a :href="getTrackUrl(track)" download class="text-sm text-blue-400 underline mt-1 block">Download</a>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </template>
+</body>
+
+<script>
+  const pb = new PocketBase('https://tapedrop.pockethost.io');
+
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('artistPage', () => ({
+      artist: {},
+      tracks: [],
+      async init() {
+        const params = new URLSearchParams(window.location.search);
+        const artistId = params.get('id');
+
+        const artistRecord = await pb.collection('artists').getOne(artistId, {
+          expand: 'label'
+        });
+        this.artist = artistRecord;
+
+        const trackList = await pb.collection('tracks').getFullList({
+          filter: `artist="${artistId}"`,
+          sort: '-created'
+        });
+        this.tracks = trackList;
+      },
+      getTrackUrl(track) {
+        return pb.files.getUrl(track, track.file);
+      }
+    }));
+  });
+</script>
+</html>
