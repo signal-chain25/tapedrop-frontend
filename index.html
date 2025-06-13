@@ -24,12 +24,10 @@
   <!-- AlpineJS -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
 
-  <!-- ✅ Correct PocketBase UMD Build -->
-  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js" defer></script>
-
-  <!-- Your app logic (must be last) -->
-  <script src="./js/main.js" defer></script>
+  <!-- ✅ PocketBase UMD – DO NOT USE `defer` -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 </head>
+
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
   <div x-data="artistList" x-init="init()" class="space-y-4">
@@ -40,5 +38,8 @@
       </a>
     </template>
   </div>
+
+  <!-- ✅ Load main.js LAST so PocketBase is guaranteed defined -->
+  <script src="./js/main.js"></script>
 </body>
 </html>
