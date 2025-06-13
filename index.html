@@ -7,7 +7,7 @@
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- TailwindCSS -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,27 +21,14 @@
     }
   </script>
 
-  <!-- AlpineJS -->
+  <!-- Alpine.js -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
 
-  <!-- ✅ PocketBase UMD (safe for browser) -->
-  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+  <!-- ✅ PocketBase (correct browser-safe version) -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/browser/pocketbase.umd.js"></script>
 
-  <script>
-    document.addEventListener('alpine:init', () => {
-      const pb = new PocketBase('https://tapedrop.pockethost.io');
-      Alpine.data('artistList', () => ({
-        artists: [],
-        async init() {
-          const records = await pb.collection('artists').getFullList({
-            expand: 'label',
-            sort: 'name'
-          });
-          this.artists = records;
-        }
-      }));
-    });
-  </script>
+  <!-- Your JS -->
+  <script src="./js/main.js" defer></script>
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
