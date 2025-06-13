@@ -21,9 +21,13 @@
     }
   </script>
 
-  <!-- AlpineJS + PocketBase (corrected version) -->
+  <!-- AlpineJS -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+
+  <!-- ✅ FIXED PocketBase script: browser-safe version -->
   <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+
+  <!-- Load AFTER PocketBase is defined -->
   <script src="./js/main.js" defer></script>
 </head>
 <body class="p-8">
