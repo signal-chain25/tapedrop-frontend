@@ -24,11 +24,30 @@
   <!-- AlpineJS -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
 
-  <!-- ✅ FIXED PocketBase script: browser-safe version -->
-  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+  <!-- ✅ Inline PocketBase loader + artist code -->
+  <script>
+    (async () => {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js";
+      script.onload = init;
+      document.head.appendChild(script);
 
-  <!-- Load AFTER PocketBase is defined -->
-  <script src="./js/main.js" defer></script>
+      function init() {
+        const pb = new PocketBase("https://tapedrop.pockethost.io");
+
+        window.artistList = {
+          artists: [],
+          async init() {
+            const records = await pb.collection('artists').getFullList({
+              expand: 'label',
+              sort: 'name',
+            });
+            this.artists = records;
+          }
+        };
+      }
+    })();
+  </script>
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
