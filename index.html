@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-gray-900 text-white">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to TapeDrop</title>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+  <script src="./js/main.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8">
+  <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
+  <div x-data="artistList" x-init="init()" class="space-y-4">
+    <template x-for="artist in artists" :key="artist.id">
+      <a :href="`artist.html?id=${artist.id}`" class="block p-4 bg-gray-800 rounded hover:bg-gray-700">
+        <div class="text-xl font-semibold" x-text="artist.name"></div>
+        <div class="text-sm text-gray-400" x-text="artist.expand?.label?.name || 'Independent'"></div>
+      </a>
+    </template>
+  </div>
+</body>
+</html>
