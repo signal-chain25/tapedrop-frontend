@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Welcome to TapeDrop</title>
 
-  <!-- Font -->
+  <!-- Font: Space Grotesk -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind -->
+  <!-- TailwindCSS + Config -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,14 +21,14 @@
     }
   </script>
 
-  <!-- Alpine.js -->
+  <!-- AlpineJS -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
 
-  <!-- ✅ PocketBase: use this one -->
-  <script src="https://unpkg.com/pocketbase@0.18.4/browser/pocketbase.umd.js"></script>
+  <!-- ✅ Correct PocketBase UMD Build -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js" defer></script>
 
-  <!-- ✅ Your code -->
-  <script defer src="./js/main.js"></script>
+  <!-- Your app logic (must be last) -->
+  <script src="./js/main.js" defer></script>
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
