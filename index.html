@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>Welcome to TapeDrop</title>
 
-  <!-- Font: Space Grotesk -->
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind + Font Config -->
+  <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,29 +24,23 @@
   <!-- AlpineJS -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
 
-  <!-- ✅ Inline PocketBase loader + artist code -->
+  <!-- ✅ PocketBase UMD (safe for browser) -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+
   <script>
-    (async () => {
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js";
-      script.onload = init;
-      document.head.appendChild(script);
-
-      function init() {
-        const pb = new PocketBase("https://tapedrop.pockethost.io");
-
-        window.artistList = {
-          artists: [],
-          async init() {
-            const records = await pb.collection('artists').getFullList({
-              expand: 'label',
-              sort: 'name',
-            });
-            this.artists = records;
-          }
-        };
-      }
-    })();
+    document.addEventListener('alpine:init', () => {
+      const pb = new PocketBase('https://tapedrop.pockethost.io');
+      Alpine.data('artistList', () => ({
+        artists: [],
+        async init() {
+          const records = await pb.collection('artists').getFullList({
+            expand: 'label',
+            sort: 'name'
+          });
+          this.artists = records;
+        }
+      }));
+    });
   </script>
 </head>
 <body class="p-8">
