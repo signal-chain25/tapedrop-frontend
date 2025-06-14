@@ -18,50 +18,102 @@
           }
         }
       }
-    };
+    }
   </script>
-</head>
-<body class="p-8">
-  <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
-  <div id="artist-list" class="space-y-4"></div>
 
-  <!-- ✅ Load PocketBase as UMD (correct version) -->
+  <!-- Alpine + PocketBase -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
   <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 
-  <!-- ✅ Inline script that uses PocketBase -->
+</head>
+<body class="p-8" x-data="artistList" x-init="init">
+
+  <h1 class="text-3xl font-bold mb-6">TapeDrop Artists</h1>
+
+  <!-- Artist List -->
+  <div class="space-y-4 mb-12">
+    <template x-if="artists.length === 0">
+      <p class="text-gray-400">No artists found yet.</p>
+    </template>
+
+    <template x-for="artist in artists" :key="artist.id">
+      <div class="p-4 bg-gray-800 rounded">
+        <div class="text-xl font-semibold" x-text="artist.name"></div>
+        <div class="text-sm text-gray-400" x-text="artist.expand?.label?.name || 'Independent'"></div>
+        <div class="mt-2 text-sm" x-text="artist.Bio"></div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Upload New Artist -->
+  <div class="bg-gray-800 p-6 rounded shadow-md max-w-xl">
+    <h2 class="text-xl font-bold mb-4">Add New Artist</h2>
+    <form @submit.prevent="submitArtist">
+      <div class="mb-4">
+        <label class="block mb-1">Name</label>
+        <input type="text" x-model="form.name" required class="w-full p-2 rounded bg-gray-700 text-white">
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Bio</label>
+        <textarea x-model="form.Bio" class="w-full p-2 rounded bg-gray-700 text-white"></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Label ID (optional)</label>
+        <input type="text" x-model="form.label" class="w-full p-2 rounded bg-gray-700 text-white">
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Logo</label>
+        <input type="file" @change="e => form.logo = e.target.files[0]" class="text-white">
+      </div>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">Create Artist</button>
+    </form>
+  </div>
+
   <script>
-    const pb = new PocketBase("https://tapedrop.pockethost.io");
+    const pb = new window.PocketBase("https://tapedrop.pockethost.io");
 
-    async function loadArtists() {
-      const container = document.getElementById("artist-list");
-      try {
-        const records = await pb.collection("artist").getFullList({
-          expand: 'label',
-          sort: 'name',
-        });
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('artistList', () => ({
+        artists: [],
+        form: {
+          name: '',
+          Bio: '',
+          label: '',
+          logo: null
+        },
+        async init() {
+          try {
+            const records = await pb.collection('artist').getFullList({
+              expand: 'label',
+              sort: 'name'
+            });
+            this.artists = records;
+          } catch (err) {
+            console.error("Error loading artists:", err);
+          }
+        },
+        async submitArtist() {
+          try {
+            const formData = new FormData();
+            formData.append('name', this.form.name);
+            formData.append('Bio', this.form.Bio);
+            if (this.form.label) formData.append('label', this.form.label);
+            if (this.form.logo) formData.append('logo', this.form.logo);
 
-        if (!records.length) {
-          container.innerHTML = `<p class="text-gray-400">No artists found.</p>`;
-          return;
+            const newArtist = await pb.collection('artist').create(formData);
+            this.artists.push(newArtist);
+            alert("Artist created successfully!");
+
+            // Reset form
+            this.form = { name: '', Bio: '', label: '', logo: null };
+          } catch (err) {
+            alert("Failed to create artist.");
+            console.error(err);
+          }
         }
-
-        records.forEach(artist => {
-          const el = document.createElement("a");
-          el.href = `artist.html?id=${artist.id}`;
-          el.className = "block p-4 bg-gray-800 rounded hover:bg-gray-700 mb-2";
-          el.innerHTML = `
-            <div class="text-xl font-semibold">${artist.name}</div>
-            <div class="text-sm text-gray-400">${artist.expand?.label?.name || 'Independent'}</div>
-          `;
-          container.appendChild(el);
-        });
-      } catch (err) {
-        container.innerHTML = `<p class="text-red-400">Error loading artists: ${err.message}</p>`;
-        console.error(err);
-      }
-    }
-
-    loadArtists();
+      }));
+    });
   </script>
+
 </body>
 </html>
