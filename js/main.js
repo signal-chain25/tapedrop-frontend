@@ -12,7 +12,7 @@ document.addEventListener('alpine:init', () => {
           });
           this.artists = records;
         } catch (err) {
-          console.error('PB fetch failed:', err);
+          console.error('Failed to fetch artists:', err);
         }
       }
     };
