@@ -1,119 +1,63 @@
 <!DOCTYPE html>
 <html lang="en" class="bg-gray-900 text-white font-sans">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Welcome to TapeDrop</title>
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Tailwind -->
+  <!-- TailwindCSS + Font -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Space Grotesk', 'sans-serif']
-          }
-        }
-      }
-    }
+            sans: ['Space Grotesk', 'sans-serif'],
+          },
+        },
+      },
+    };
   </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Alpine + PocketBase -->
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+  <!-- ✅ PocketBase must load first, no defer -->
   <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 
+  <!-- ✅ AlpineJS can be deferred -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body class="p-8" x-data="artistList" x-init="init">
 
-  <h1 class="text-3xl font-bold mb-6">TapeDrop Artists</h1>
+<body class="p-8">
+  <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
 
-  <!-- Artist List -->
-  <div class="space-y-4 mb-12">
-    <template x-if="artists.length === 0">
-      <p class="text-gray-400">No artists found yet.</p>
-    </template>
-
+  <div x-data="artistList" x-init="init()" class="space-y-4">
     <template x-for="artist in artists" :key="artist.id">
-      <div class="p-4 bg-gray-800 rounded">
+      <a :href="`artist.html?id=${artist.id}`" class="block p-4 bg-gray-800 rounded hover:bg-gray-700">
         <div class="text-xl font-semibold" x-text="artist.name"></div>
         <div class="text-sm text-gray-400" x-text="artist.expand?.label?.name || 'Independent'"></div>
-        <div class="mt-2 text-sm" x-text="artist.Bio"></div>
-      </div>
+      </a>
     </template>
   </div>
 
-  <!-- Upload New Artist -->
-  <div class="bg-gray-800 p-6 rounded shadow-md max-w-xl">
-    <h2 class="text-xl font-bold mb-4">Add New Artist</h2>
-    <form @submit.prevent="submitArtist">
-      <div class="mb-4">
-        <label class="block mb-1">Name</label>
-        <input type="text" x-model="form.name" required class="w-full p-2 rounded bg-gray-700 text-white">
-      </div>
-      <div class="mb-4">
-        <label class="block mb-1">Bio</label>
-        <textarea x-model="form.Bio" class="w-full p-2 rounded bg-gray-700 text-white"></textarea>
-      </div>
-      <div class="mb-4">
-        <label class="block mb-1">Label ID (optional)</label>
-        <input type="text" x-model="form.label" class="w-full p-2 rounded bg-gray-700 text-white">
-      </div>
-      <div class="mb-4">
-        <label class="block mb-1">Logo</label>
-        <input type="file" @change="e => form.logo = e.target.files[0]" class="text-white">
-      </div>
-      <button type="submit" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">Create Artist</button>
-    </form>
-  </div>
-
+  <!-- ✅ Inline app logic -->
   <script>
-    const pb = new window.PocketBase("https://tapedrop.pockethost.io");
+    const pb = new PocketBase("https://tapedrop.pockethost.io");
 
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('artistList', () => ({
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("artistList", () => ({
         artists: [],
-        form: {
-          name: '',
-          Bio: '',
-          label: '',
-          logo: null
-        },
         async init() {
           try {
-            const records = await pb.collection('artist').getFullList({
-              expand: 'label',
-              sort: 'name'
+            const records = await pb.collection("artist").getFullList({
+              expand: "label",
+              sort: "name",
             });
             this.artists = records;
-          } catch (err) {
-            console.error("Error loading artists:", err);
+          } catch (e) {
+            console.error("Failed to fetch artists:", e);
           }
         },
-        async submitArtist() {
-          try {
-            const formData = new FormData();
-            formData.append('name', this.form.name);
-            formData.append('Bio', this.form.Bio);
-            if (this.form.label) formData.append('label', this.form.label);
-            if (this.form.logo) formData.append('logo', this.form.logo);
-
-            const newArtist = await pb.collection('artist').create(formData);
-            this.artists.push(newArtist);
-            alert("Artist created successfully!");
-
-            // Reset form
-            this.form = { name: '', Bio: '', label: '', logo: null };
-          } catch (err) {
-            alert("Failed to create artist.");
-            console.error(err);
-          }
-        }
       }));
     });
   </script>
-
 </body>
 </html>
