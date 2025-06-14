@@ -24,18 +24,18 @@
   <!-- Alpine.js -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-  <!-- PocketBase as ES Module -->
+  <!-- ✅ Correct PocketBase via esm.sh -->
   <script type="module">
-    import PocketBase from 'https://esm.sh/pocketbase';
+    import PocketBase from "https://esm.sh/pocketbase@0.18.4";
 
-    window.pb = new PocketBase('https://tapedrop.pockethost.io');
+    const pb = new PocketBase('https://tapedrop.pockethost.io');
 
     document.addEventListener('alpine:init', () => {
       Alpine.data('artistList', () => ({
         artists: [],
         async init() {
           try {
-            const records = await window.pb.collection('artist').getFullList({
+            const records = await pb.collection('artist').getFullList({
               expand: 'label',
               sort: 'name',
             });
