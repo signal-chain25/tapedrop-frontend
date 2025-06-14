@@ -4,14 +4,20 @@
     <meta charset="UTF-8" />
     <title>Welcome to TapeDrop</title>
 
-    <!-- Tailwind -->
+    <!-- Font: Space Grotesk -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Space Grotesk', 'sans-serif'],
+              sans: ["Space Grotesk", "sans-serif"],
             },
           },
         },
@@ -19,12 +25,15 @@
     </script>
 
     <!-- AlpineJS -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
 
-    <!-- ✅ PocketBase UMD -->
+    <!-- ✅ PocketBase UMD (must NOT be defer!) -->
     <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 
-    <!-- Inline app logic -->
+    <!-- ✅ Alpine Component AFTER PocketBase -->
     <script>
       document.addEventListener("alpine:init", () => {
         const pb = new PocketBase("https://tapedrop.pockethost.io");
@@ -33,13 +42,13 @@
           artists: [],
           async init() {
             try {
-              const result = await pb.collection("artist").getFullList({
+              const records = await pb.collection("artist").getFullList({
                 expand: "label",
                 sort: "name",
               });
-              this.artists = result;
-            } catch (e) {
-              console.error("Error loading artists", e);
+              this.artists = records;
+            } catch (err) {
+              console.error("Error loading artists:", err);
             }
           },
         }));
