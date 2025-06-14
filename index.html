@@ -7,7 +7,7 @@
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind -->
+  <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -21,16 +21,17 @@
     }
   </script>
 
-  <!-- AlpineJS + PocketBase (must load BEFORE main.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <!-- AlpineJS -->
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+
+  <!-- ✅ PocketBase (browser-safe) -->
   <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 
-  <!-- Your App Logic -->
-  <script src="./js/main.js" defer></script>
+  <!-- Main App Logic -->
+  <script defer src="./js/main.js"></script>
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
-
   <div x-data="artistList" x-init="init()" class="space-y-4">
     <template x-for="artist in artists" :key="artist.id">
       <a :href="`artist.html?id=${artist.id}`" class="block p-4 bg-gray-800 rounded hover:bg-gray-700">
