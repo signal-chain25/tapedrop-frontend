@@ -22,16 +22,14 @@
   </script>
 
   <!-- AlpineJS -->
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-  <!-- ✅ THIS is the working PocketBase browser build -->
-  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.18.4/dist/pocketbase.umd.min.js" defer></script>
-
-  <!-- Your main logic (must be last) -->
-  <script src="./js/main.js" defer></script>
+  <!-- ✅ PocketBase: correct browser-safe version -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
+
   <div x-data="artistList" x-init="init()" class="space-y-4">
     <template x-for="artist in artists" :key="artist.id">
       <a :href="`artist.html?id=${artist.id}`" class="block p-4 bg-gray-800 rounded hover:bg-gray-700">
@@ -40,5 +38,26 @@
       </a>
     </template>
   </div>
+
+  <script>
+    const pb = new PocketBase("https://tapedrop.pockethost.io");
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('artistList', () => ({
+        artists: [],
+        async init() {
+          try {
+            const records = await pb.collection('artist').getFullList({
+              expand: 'label',
+              sort: 'name',
+            });
+            this.artists = records;
+          } catch (e) {
+            console.error("Failed to load artists:", e);
+          }
+        }
+      }));
+    });
+  </script>
 </body>
 </html>
