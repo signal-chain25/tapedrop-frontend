@@ -5,7 +5,7 @@
   <title>Welcome to TapeDrop</title>
 
   <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,21 +23,21 @@
 </head>
 <body class="p-8">
   <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
-
   <div id="artist-list" class="space-y-4"></div>
 
-  <!-- PocketBase -->
-  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+  <!-- ✅ Load PocketBase as UMD (correct version) -->
+  <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
 
+  <!-- ✅ Inline script that uses PocketBase -->
   <script>
-    const pb = new window.default("https://tapedrop.pockethost.io");
+    const pb = new PocketBase("https://tapedrop.pockethost.io");
 
     async function loadArtists() {
       const container = document.getElementById("artist-list");
       try {
         const records = await pb.collection("artist").getFullList({
           expand: 'label',
-          sort: 'name'
+          sort: 'name',
         });
 
         if (!records.length) {
