@@ -4,12 +4,6 @@
     <meta charset="UTF-8" />
     <title>Welcome to TapeDrop</title>
 
-    <!-- Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,22 +18,34 @@
       };
     </script>
 
-    <!-- Alpine -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-      defer
-    ></script>
+    <!-- AlpineJS -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    <!-- PocketBase ESM -->
-    <script type="module">
-      import PocketBase from 'https://cdn.jsdelivr.net/npm/pocketbase@0.18.4/dist/pocketbase.es.mjs';
-      window.PocketBase = PocketBase;
+    <!-- ✅ PocketBase UMD -->
+    <script src="https://unpkg.com/pocketbase@0.18.4/dist/pocketbase.umd.js"></script>
+
+    <!-- Inline app logic -->
+    <script>
+      document.addEventListener("alpine:init", () => {
+        const pb = new PocketBase("https://tapedrop.pockethost.io");
+
+        Alpine.data("artistList", () => ({
+          artists: [],
+          async init() {
+            try {
+              const result = await pb.collection("artist").getFullList({
+                expand: "label",
+                sort: "name",
+              });
+              this.artists = result;
+            } catch (e) {
+              console.error("Error loading artists", e);
+            }
+          },
+        }));
+      });
     </script>
-
-    <!-- Alpine logic -->
-    <script type="module" src="./js/artistList.js"></script>
   </head>
-
   <body class="p-8">
     <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
     <div x-data="artistList" x-init="init()" class="space-y-4">
