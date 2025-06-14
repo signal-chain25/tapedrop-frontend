@@ -1,62 +1,60 @@
 <!DOCTYPE html>
 <html lang="en" class="bg-gray-900 text-white font-sans">
-<head>
-  <meta charset="UTF-8" />
-  <title>Welcome to TapeDrop</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Welcome to TapeDrop</title>
 
-  <!-- Font: Space Grotesk -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Space Grotesk', 'sans-serif'],
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Space Grotesk', 'sans-serif'],
+            },
           },
         },
-      },
-    };
-  </script>
+      };
+    </script>
 
-  <!-- Alpine.js -->
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Alpine -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
 
-  <!-- ✅ Correct PocketBase via esm.sh -->
-  <script type="module">
-    import PocketBase from "https://esm.sh/pocketbase@0.18.4";
+    <!-- PocketBase ESM -->
+    <script type="module">
+      import PocketBase from 'https://cdn.jsdelivr.net/npm/pocketbase@0.18.4/dist/pocketbase.es.mjs';
+      window.PocketBase = PocketBase;
+    </script>
 
-    const pb = new PocketBase('https://tapedrop.pockethost.io');
+    <!-- Alpine logic -->
+    <script type="module" src="./js/artistList.js"></script>
+  </head>
 
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('artistList', () => ({
-        artists: [],
-        async init() {
-          try {
-            const records = await pb.collection('artist').getFullList({
-              expand: 'label',
-              sort: 'name',
-            });
-            this.artists = records;
-          } catch (err) {
-            console.error('Failed to load artists:', err);
-          }
-        },
-      }));
-    });
-  </script>
-</head>
-<body class="p-8">
-  <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
-  <div x-data="artistList" x-init="init()" class="space-y-4">
-    <template x-for="artist in artists" :key="artist.id">
-      <a :href="`artist.html?id=${artist.id}`" class="block p-4 bg-gray-800 rounded hover:bg-gray-700">
-        <div class="text-xl font-semibold" x-text="artist.name"></div>
-        <div class="text-sm text-gray-400" x-text="artist.expand?.label?.name || 'Independent'"></div>
-      </a>
-    </template>
-  </div>
-</body>
+  <body class="p-8">
+    <h1 class="text-3xl font-bold mb-4">TapeDrop Artists</h1>
+    <div x-data="artistList" x-init="init()" class="space-y-4">
+      <template x-for="artist in artists" :key="artist.id">
+        <a
+          :href="`artist.html?id=${artist.id}`"
+          class="block p-4 bg-gray-800 rounded hover:bg-gray-700"
+        >
+          <div class="text-xl font-semibold" x-text="artist.name"></div>
+          <div
+            class="text-sm text-gray-400"
+            x-text="artist.expand?.label?.name || 'Independent'"
+          ></div>
+        </a>
+      </template>
+    </div>
+  </body>
 </html>
